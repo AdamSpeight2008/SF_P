@@ -9,11 +9,11 @@ Imports System.Reflection
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("SFD.StringFormat")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyDescription("Format String Parser")> 
+<Assembly: AssemblyCompany("AdamSpeight2008")> 
 <Assembly: AssemblyProduct("SFD.StringFormat")> 
 <Assembly: AssemblyCopyright("Copyright ©  2014")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyTrademark("AdamSpeight2008")> 
 <Assembly: NeutralResourcesLanguage("en")>
 
 ' Version information for an assembly consists of the following four values:
@@ -27,5 +27,5 @@ Imports System.Reflection
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.1.0.0")> 
+<Assembly: AssemblyFileVersion("1.1.0.0")> 
