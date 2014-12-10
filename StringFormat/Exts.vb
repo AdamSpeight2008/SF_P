@@ -1,6 +1,8 @@
-﻿Imports System.Runtime.CompilerServices
-Imports StringFormat.StringFormat
-Namespace Global.StringFormat
+﻿Imports SFD.System.Runtime.CompilerServices
+Imports SFD.StringFormat.StringFormat
+Imports System.Runtime.CompilerServices
+
+Namespace  Global.SFD.StringFormat
 
   Public Module Exts
 
