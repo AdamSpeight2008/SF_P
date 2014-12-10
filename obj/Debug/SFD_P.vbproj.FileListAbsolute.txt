@@ -1,0 +1,26 @@
+c:\users\adam\documents\visual studio 2013\Projects\SFD_P\bin\Debug\SFD_P.exe.config
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\SFD_P.exe
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\SFD_P.pdb
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\SFD_P.xml
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.vbprojResolveAssemblyReference.cache
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.Resources.resources
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.vbproj.GenerateResource.Cache
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.exe
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.xml
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\obj\Debug\SFD_P.pdb
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\StringFormat.dll
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\StringFormat.pdb
+C:\Users\Adam\Documents\Visual Studio 2013\Projects\SFD_P\bin\Debug\StringFormat.xml
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\SFD_P.exe.config
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.exe
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.xml
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.pdb
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\SFD_P.exe
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\SFD_P.pdb
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\SFD_P.xml
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\StringFormat.dll
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\StringFormat.pdb
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\bin\Debug\StringFormat.xml
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.vbprojResolveAssemblyReference.cache
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.Resources.resources
+C:\Users\Adam\Documents\GitHub\SF_P\SFD_P\obj\Debug\SFD_P.vbproj.GenerateResource.Cache
