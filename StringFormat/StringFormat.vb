@@ -287,11 +287,16 @@ Public Class StringFormat
     Dim parts As New List(Of SpanKind)
     While i < source.Length
       Dim c = source(i)
+      If c.HasValue = False Then Exit While 
       Dim q = Quoted(source, i)
-      If q.Kind = Kinds.QBL OrElse q.Kind = Kinds.QBR Then
-        parts.Add(q)
-        i = q.Finish
-      Else
+        If q.Kind = Kinds.Quoted Then
+          parts.Add(q)
+          i = q.Finish
+        ElseIf c.Value = Constants.Brace_L Then
+          Exit While
+        ElseIf c.Value = Constants.Brace_R Then
+          Exit While
+        Else
         'Dim _BR = BR(source, i)
         'If _BR.Kind = Kinds.BR Then
         '  Exit While
