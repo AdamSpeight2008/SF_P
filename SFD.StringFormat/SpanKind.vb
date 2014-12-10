@@ -9,10 +9,11 @@ Namespace Global.SFD.StringFormat
     Public ReadOnly Property Kind As Kinds
     Public ReadOnly Property MadeOf As New List(Of SpanKind)
 
-    Private Sub New(kind As Kinds, span As Span, ParamArray MadeOf() As SpanKind)
+    Private Sub New(kind As Kinds, span As Span,
+                    Optional MadeOf As IEnumerable(Of SpanKind) = Nothing)
       _Span = span
       _Kind = kind
-      _MadeOf.AddRange(MadeOf)
+      If MadeOf IsNot Nothing Then _MadeOf.AddRange(MadeOf)
     End Sub
 
     Default Public ReadOnly Property MadeOfItem(ByVal Index As Integer) As SpanKind
@@ -32,13 +33,15 @@ Namespace Global.SFD.StringFormat
       Return s.Kind = Kinds.None
     End Operator
 
-    Public Shared Function MakeFrom(kind As Kinds, Start As SpanKind, Finish As SpanKind, ParamArray MadeOf() As SpanKind) As SpanKind
+    Public Shared Function MakeFrom(kind As Kinds, Start As SpanKind, Finish As SpanKind,
+                                    Optional MadeOf As IEnumerable(Of SpanKind)=Nothing) As SpanKind
       Dim ref = Start.Span.Source
       Dim span = New Span(ref, Start.Span.Start, Finish.Span.Finish)
       Return New SpanKind(kind, span, MadeOf)
     End Function
 
-    Public Shared Function MakeFrom(kind As Kinds, source As SourceText, Start As Integer, Finish As Integer, ParamArray MadeOf() As SpanKind) As SpanKind
+    Public Shared Function MakeFrom(kind As Kinds, source As SourceText, Start As Integer, Finish As Integer,
+                                    Optional MadeOf As IEnumerable(Of SpanKind) = Nothing) As SpanKind
       Dim span = New Span(source, Start, Finish)
       Return New SpanKind(kind, span, MadeOf)
     End Function
