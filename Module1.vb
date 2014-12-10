@@ -4,7 +4,7 @@
 Module Module1
 
   Sub Main()
-    Dim s = "X:= {0}  Y:={1}"
+    Dim s = "{00}{}"
     Dim r0 = ""
     Try
       r0 = String.Format(s, 1.2345, 2.45)

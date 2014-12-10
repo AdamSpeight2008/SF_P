@@ -1,11 +1,14 @@
-﻿Namespace Global.StringFormat
+﻿Imports StringFormat.Exts
+
+Namespace Global.StringFormat
 
 Public Class StringFormat
 
 
-  Public Enum Kinds As Integer
+
+
+    Public Enum Kinds As Integer
     None         '
-      Err_EOT          ' 
       Digits       ' ::- ( '0' - '9' )+
       BL           ' ::= '{'
       BR           ' ::= '}'
@@ -23,7 +26,14 @@ Public Class StringFormat
       TextChars    ' ::=
       Text         ' ::= Qouted | TextChars
       FormatString ' ::= ( Text | ArgHole )*
+      Err_EOT          ' 
       Err_UC
+      Err_Malformed_ArgHole
+      Err_Malformed_ArgIndex
+      Err_Malformed_ArgAlign
+      Err_Malformed_ArgFormat
+      Err_Malformed_Text
+      Err_Malformed_FormatString
     End Enum
 
     Public Class Constants
@@ -89,6 +99,14 @@ Public Class StringFormat
         Return String.Format("{0}  {1}", Span, Kind.ToString("F"))
       End Function
 
+      Public Shared Operator =(sk As SpanKind, k As Kinds ) As Boolean
+        If sk Is Nothing Then Return false
+        Return sk.Kind = k
+      End Operator
+      Public Shared Operator <>(sk As SpanKind, k As Kinds) As Boolean
+        If sk Is Nothing Then Return False
+        Return sk.Kind <> k
+      End Operator
     End Class
 
 
@@ -119,12 +137,11 @@ Public Class StringFormat
       Dim si = i
       While (i < source.Length)
         Dim c = source(i)
-        If c.HasValue AndAlso (c.Value = Constants.Space) Then
-          i += 1
-        Else
-          Exit While
-        End If
+        If c.HasValue = False Then Exit While
+        If c.Value <> Constants.Space Then Exit While
+        i+=1
       End While
+      If (si-i)=0 Then Return SpanKind.MakeFrom(Kinds.None,si,i)
       Return SpanKind.MakeFrom(Kinds.Spaces, si, i)
     End Function
 
@@ -155,38 +172,62 @@ Public Class StringFormat
 
     Private Shared Function Arg_Index(Source As SourceText, i As Integer) As SpanKind
       ' Arg_Index ::= Digits Spaces
-      Dim _Digits = Digits(Source, i)
-      Dim _Spaces = Spaces(Source, _Digits.Span.Finish)
-      Dim r = SpanKind.MakeFrom(Kinds.Arg_Index, _Digits, _Spaces, _Digits, _Spaces)
-      If r.Span.Size > 0 Then Return r
-      Return SpanKind.MakeFrom(Kinds.None, _Digits, _Spaces)
+      Dim parts As New List(Of SpanKind)
+      Dim _Digits = Digits(Source, i) : If _Digits.IsNotNone Then parts.Add(_Digits)
+      Dim _Spaces = Spaces(Source, _Digits.Span.Finish) : If _Spaces.IsNotNone Then parts.Add(_Spaces)
+      If _Digits.IsNotNone Then
+
+        Dim c = Source(_Spaces.Finish)
+        If c.HasValue Then
+          If (c.Value = Constants.Comma OrElse c.Value = Constants.Colon OrElse c.Value = Constants.Brace_R) Then
+            Return SpanKind.MakeFrom(Kinds.Arg_Index, _Digits, _Spaces, parts.ToArray)
+          Else
+            parts.Add(SpanKind.MakeFrom(Kinds.Err_UC, _Spaces.Finish, _Spaces.Finish + 1))
+            Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgIndex, _Digits, _Spaces, parts.ToArray)
+
+
+          End If
+        Else
+          parts.Add(SpanKind.MakeFrom(Kinds.Err_EOT, _Spaces.Finish, _Spaces.Finish))
+          Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgIndex, _Digits, _Spaces, parts.ToArray)
+
+        End If
+      Else
+        Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgIndex, _Digits, _Spaces, parts.ToArray)
+
+        Return SpanKind.MakeFrom(Kinds.None, _Digits, _Spaces)
+
+      End If
+
     End Function
 
     Private Shared Function Arg_Align(Source As SourceText, i As Integer) As SpanKind
       ' Arg_Align ::= Comma Spaces Minus? Digits Spaces
-      Dim _Comma = Comma(Source, i)
-      Dim _SpaceA = Spaces(Source, _Comma.Span.Finish)
-      Dim _Minus = Minus(Source, _SpaceA.Span.Finish)
-      Dim _Digit = Digits(Source, _Minus.Span.Finish)
-      Dim _SpaceB = Spaces(Source, _Digit.Span.Finish)
-      Dim s = SpanKind.MakeFrom(Kinds.Arg_Align, _Comma, _SpaceB, _Comma, _SpaceA, _Minus, _Digit, _SpaceB)
-      If s.Span.Size > 0 Then Return s
-      Return SpanKind.MakeFrom(Kinds.None, _Comma, _SpaceB)
+      Dim parts As New List(Of SpanKind)
+      Dim _Comma = Comma(Source, i) : If _Comma.IsNotNone  Then parts.Add(_Comma)
+      Dim _SpaceA = Spaces(Source, _Comma.Span.Finish) : If _SpaceA.IsNotNone Then parts.Add(_SpaceA)
+      Dim _Minus  =  Minus(Source, _SpaceA.Span.Finish) : If _Minus.IsNotNone Then parts.Add(_Minus)
+      Dim _Digit  = Digits(Source, _Minus.Span.Finish)  : If _Digit.IsNotNone Then parts.Add(_Digit)
+      Dim _SpaceB = Spaces(Source, _Digit.Span.Finish)  : If _SpaceB.IsNotNone Then parts.Add(_SpaceB)
+
+      If _Comma.IsNone Then Return SpanKind.MakeFrom(Kinds.None,_Comma)
+      If _Minus.IsNone AndAlso _Comma.IsNotNone AndAlso _Digit.IsNotNone Then Return SpanKind.MakeFrom(Kinds.Arg_Align, _Comma, _SpaceB, parts.ToArray)
+      If _Minus.IsNotNone AndAlso _Comma.IsNotNone AndAlso _Digit.IsNotNone Then Return SpanKind.MakeFrom(Kinds.Arg_Align, _Comma, _SpaceB, parts.ToArray)
+      Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgAlign, _Comma, _SpaceB, parts.ToArray)
     End Function
 
     Private Shared Function Arg_Format(Source As SourceText, i As Integer) As SpanKind
-      'Throw New System.NotImplementedException
       Dim parts As New List(Of SpanKind)
 
       Dim _Colon = Colon(Source, i)
-      If _Colon.Kind = Kinds.Colon Then
+      If _Colon = Kinds.Colon Then
         parts.Add(_Colon)
         i = _Colon.Finish
         While i < Source.Length
           Dim c = Source(i)
           If c.HasValue = False Then Exit While
           Dim _Quoted = Quoted(Source, i)
-          If _Quoted.Kind = Kinds.Quoted Then
+          If _Quoted = Kinds.Quoted Then
             parts.Add(_Quoted)
             i = _Quoted.Finish
           ElseIf c.Value = Constants.Brace_R Then
@@ -203,7 +244,7 @@ Public Class StringFormat
         End While
         Dim _Error0_ = SpanKind.MakeFrom(Kinds.Err_EOT, i, i)
         parts.Add(_Error0_)
-        Return SpanKind.MakeFrom(Kinds.Arg_Format, parts.First, parts.Last, parts.ToArray)
+        Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgFormat, parts.First, parts.Last, parts.ToArray)
     Else
         Return SpanKind.MakeFrom(Kinds.None,_Colon)
     End If 
@@ -218,18 +259,20 @@ Public Class StringFormat
     Dim _ArgFormat = Arg_Format(source, _ArgAlign.Finish)
     Dim _BR = BR(source, _ArgFormat.Finish)
 
-    If _BL.Kind = Kinds.BL Then s.Add(_BL)
-    If _ArgIndex.Kind = Kinds.Arg_Index Then s.Add(_ArgIndex)
-    If _ArgAlign.Kind = Kinds.Arg_Align Then s.Add(_ArgAlign)
-    If _ArgFormat.Kind = Kinds.Arg_Format Then s.Add(_ArgFormat)
-    If _BR.Kind = Kinds.BR Then s.Add(_BR)
+    If _BL = Kinds.BL Then s.Add(_BL)
+    If _ArgIndex = Kinds.Arg_Index Then s.Add(_ArgIndex)
+    If _ArgAlign = Kinds.Arg_Align Then s.Add(_ArgAlign)
+    If _ArgFormat = Kinds.Arg_Format Then s.Add(_ArgFormat)
+    If _BR = Kinds.BR Then s.Add(_BR)
 
-    If (_BL.Kind = Kinds.None) OrElse (_BR.Kind = Kinds.None) OrElse (_ArgIndex.Kind = Kinds.None) Then
-      Return SpanKind.MakeFrom(Kinds.None, _BL, _BR, s.ToArray)
-    End If
+    If _BL.IsNone Then  Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgHole, _BL, _BR, s.ToArray)
+      If _BR.IsNone Then Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgHole, _BL, _BR, s.ToArray)
+      If _ArgIndex.IsNotNone AndAlso _ArgIndex <> Kinds.Err_Malformed_ArgIndex Then
+        Return SpanKind.MakeFrom(Kinds.ArgHole, _BL, _BR, s.ToArray)
+      End If
 
-    Dim p = SpanKind.MakeFrom(Kinds.ArgHole, _BL, _BR, s.ToArray)
-    Return p
+
+      Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgHole, _BL, _BR, s.ToArray)
   End Function
 
   Private Shared Function BL(Source As SourceText, i As Integer) As SpanKind
@@ -274,10 +317,8 @@ Public Class StringFormat
 
   Private Shared Function Quoted(source As SourceText, i As Integer) As SpanKind
     ' Qouted ::= QBL | QBR
-    Dim _QL = QBL(source, i)
-    If _QL.Kind = Kinds.QBL Then Return SpanKind.MakeFrom(Kinds.Quoted, _QL, _QL, _QL)
-    Dim _QR = QBR(source, i)
-    If _QR.Kind = Kinds.QBR Then Return SpanKind.MakeFrom(Kinds.Quoted, _QR, _QR, _QR)
+    Dim _QL = QBL(source, i) : If _QL = Kinds.QBL Then Return SpanKind.MakeFrom(Kinds.Quoted, _QL, _QL, _QL)
+    Dim _QR = QBR(source, i) : If _QR = Kinds.QBR Then Return SpanKind.MakeFrom(Kinds.Quoted, _QR, _QR, _QR)
     Return SpanKind.MakeFrom(Kinds.None, _QR)
   End Function
 
@@ -289,22 +330,18 @@ Public Class StringFormat
       Dim c = source(i)
       If c.HasValue = False Then Exit While 
       Dim q = Quoted(source, i)
-        If q.Kind = Kinds.Quoted Then
+        If q = Kinds.Quoted Then
           parts.Add(q)
           i = q.Finish
         ElseIf c.Value = Constants.Brace_L Then
+
           Exit While
         ElseIf c.Value = Constants.Brace_R Then
           Exit While
         Else
-        'Dim _BR = BR(source, i)
-        'If _BR.Kind = Kinds.BR Then
-        '  Exit While
-        'Else
-        i += 1
-        'End If
-      End If
-    End While
+          i += 1
+        End If
+      End While
     Return SpanKind.MakeFrom(Kinds.Text, si, i, parts.ToArray)
   End Function
 
@@ -316,19 +353,26 @@ Public Class StringFormat
       Dim _Text = Text(source, i)
       Dim _ArgHole = Arg_Hole(source, i)
 
-      If _ArgHole.Kind = Kinds.ArgHole Then
-        parts.Add(_ArgHole)
-        i = _ArgHole.Finish
-      ElseIf _Text.Kind = Kinds.Text Then
+        If _ArgHole = Kinds.ArgHole Then
+          parts.Add(_ArgHole)
+          i = _ArgHole.Finish
+        ElseIf _ArgHole = Kinds.Err_Malformed_ArgHole Then
+          parts.Add(_ArgHole)
+          i = _ArgHole.Finish
+        ElseIf _Text = Kinds.Text Then
         parts.Add(_Text)
         i = _Text.Finish
       Else
-        Debugger.Break()
+        i += 1
       End If
     End While
-    If parts.Any Then Return SpanKind.MakeFrom(Kinds.FormatString, parts.First, parts.Last, parts.ToArray)
-    Return SpanKind.MakeFrom(Kinds.None, si, si)
-  End Function
+    If parts.Count >0 Then
+       Dim HasErrors = parts.Any(Function(sk) sk.HasError)
+       If HasErrors Then Return SpanKind.MakeFrom(Kinds.Err_Malformed_FormatString, parts.First, parts.Last, parts.ToArray)
+Return SpanKind.MakeFrom(Kinds.FormatString, parts.First, parts.Last, parts.ToArray)
+    End If
+      Return SpanKind.MakeFrom(Kinds.None, si, si)
+    End Function
 
   Public Shared Function Parse(s As String) As SpanKind
     Return FormatString(SourceText.Create(s), 0)
