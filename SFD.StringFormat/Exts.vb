@@ -5,6 +5,11 @@ Imports SFD.StringFormat.StringFormat
 Namespace  Global.SFD.StringFormat
 
   Public Module Exts
+    <Extension>
+    Public Function IsEmpty(sk As SpanKind) As Boolean
+      Return sk.Span.Size = 0
+    End Function
+
 
     <Extension>
     Public Function IsNone(sk As SpanKind) As Boolean

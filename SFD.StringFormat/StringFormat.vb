@@ -169,9 +169,9 @@ Namespace Global.SFD.StringFormat
           If c.HasValue = False Then Exit While
           Dim _Quoted = Quoted(Source, i)
           If _Quoted = Kinds.Quoted Then
-            Dim tp = SpanKind.MakeFrom(Kinds.TextChars, Source, ti, _Quoted.Start)
-            If tp.Span.Size > 0 Then parts.Add(tp)
-            parts.Add(_Quoted)
+            'Dim tp = SpanKind.MakeFrom(Kinds.TextChars, Source, ti, _Quoted.Start)
+            'If tp.Span.Size > 0 Then parts.Add(tp)
+            'parts.Add(_Quoted)
             i = _Quoted.Finish
             ti = i
           ElseIf c.Value = Constants.Brace_R Then
@@ -280,7 +280,11 @@ Namespace Global.SFD.StringFormat
         '  parts.Add(q)
           i = q.Finish
         ElseIf c.Value = Constants.Brace_L Then
-
+          Dim ti = i
+          Dim _ARG_ = Arg_Hole(source,i)
+          If _ARG_ = Kinds.ArgHole Then Exit While
+          If _ARG_ = Kinds.Err_Malformed_ArgHole Then Exit While 
+          Return SpanKind.MakeFrom(Kinds.Err_Malformed_Text,source,si,i+1,parts)
           Exit While
         ElseIf c.Value = Constants.Brace_R Then
           Exit While
@@ -292,7 +296,7 @@ Namespace Global.SFD.StringFormat
     End Function
 
     Private Shared Function FormatString(source As SourceText, i As Integer) As SpanKind
-      ' FormatString ::= ( Text | ArgHole )+
+      ' FormatString ::= ( ArgHole|Text   )+
       Dim si = i
       Dim parts As New List(Of SpanKind)
       While i < source.Length
@@ -302,26 +306,37 @@ Namespace Global.SFD.StringFormat
         If _ArgHole = Kinds.ArgHole Then
           parts.Add(_ArgHole)
           i = _ArgHole.Finish
-
-        ElseIf _ArgHole = Kinds.Err_Malformed_ArgHole Then
-          If _ArgHole.Span.Size > 0 Then
-            parts.Add(_ArgHole)
-            i = _ArgHole.Finish
-          Else
-            If _Text = Kinds.Text Then
-              parts.Add(_Text)
-              i = _Text.Finish
-            Else
-              i += 1
-            End If
-          End If
-
-        ElseIf _Text = Kinds.Text Then
+        ElseIf _Text = Kinds.Text AndAlso _Text.IsEmpty = False Then
+          parts.Add(_Text )
+          i = _Text.Finish
+        Else If _ArgHole = Kinds.Err_Malformed_ArgHole Then
+          parts.Add(_ArgHole)
+          i = _ArgHole.Finish
+        ElseIf _Text = Kinds.Err_Malformed_Text Then
           parts.Add(_Text)
           i = _Text.Finish
-        Else
-          i += 1
+          Exit While
         End If
+
+        'ElseIf _ArgHole = Kinds.Err_Malformed_ArgHole Then
+        '  If _ArgHole.Span.Size > 0 Then
+        '    parts.Add(_ArgHole)
+        '    i = _ArgHole.Finish
+        '  Else
+        '    If _Text = Kinds.Text Then
+        '      parts.Add(_Text)
+        '      i = _Text.Finish
+        '    Else
+        '      i += 1
+        '    End If
+        '  End If
+
+        'ElseIf _Text = Kinds.Text Then
+        '  parts.Add(_Text)
+        '  i = _Text.Finish
+        'Else
+        '  i += 1
+        'End If
       End While
       If parts.Count > 0 Then
         Dim HasErrors = parts.Any(Function(sk) sk.HasError)
