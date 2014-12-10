@@ -1,6 +1,6 @@
 ﻿Imports System
+Imports System.Resources
 Imports System.Reflection
-Imports System.Runtime.InteropServices
 
 ' General Information about an assembly is controlled through the following 
 ' set of attributes. Change these attribute values to modify the information
@@ -8,17 +8,13 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("StringFormat")> 
+<Assembly: AssemblyTitle("SFD.StringFormat")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("StringFormat")> 
+<Assembly: AssemblyProduct("SFD.StringFormat")> 
 <Assembly: AssemblyCopyright("Copyright ©  2014")> 
 <Assembly: AssemblyTrademark("")> 
-
-<Assembly: ComVisible(False)>
-
-'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("24e2060f-a8bd-4e29-9d42-09719b8c191b")> 
+<Assembly: NeutralResourcesLanguage("en")>
 
 ' Version information for an assembly consists of the following four values:
 '

@@ -187,3 +187,14 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+*.chk
+SFD_P.sln.ide/edb.chk
+obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+obj/Debug/SFD_P.exe
+obj/Debug/SFD_P.vbproj.GenerateResource.Cache
+*.cache
+*.exe
+*.pdb
+*.cache
+*.pdb

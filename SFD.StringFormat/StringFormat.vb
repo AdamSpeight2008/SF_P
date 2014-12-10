@@ -158,19 +158,25 @@ Namespace Global.SFD.StringFormat
 
     Private Shared Function Arg_Format(Source As SourceText, i As Integer) As SpanKind
       Dim parts As New List(Of SpanKind)
-
+      Dim ti=0
       Dim _Colon = Colon(Source, i)
       If _Colon = Kinds.Colon Then
         parts.Add(_Colon)
         i = _Colon.Finish
+        ti=i
         While i < Source.Length
           Dim c = Source(i)
           If c.HasValue = False Then Exit While
           Dim _Quoted = Quoted(Source, i)
           If _Quoted = Kinds.Quoted Then
+            Dim tp = SpanKind.MakeFrom(Kinds.TextChars, Source, ti, _Quoted.Start)
+            If tp.Span.Size > 0 Then parts.Add(tp)
             parts.Add(_Quoted)
             i = _Quoted.Finish
+            ti = i
           ElseIf c.Value = Constants.Brace_R Then
+            Dim tp = SpanKind.MakeFrom(Kinds.TextChars, Source, ti, i)
+            If tp.Span.Size > 0 Then parts.Add(tp)
             Return SpanKind.MakeFrom(Kinds.Arg_Format, Source, parts.First.Start, i, parts.ToArray)
 
           ElseIf c.Value = Constants.Brace_L Then
@@ -271,7 +277,7 @@ Namespace Global.SFD.StringFormat
         If c.HasValue = False Then Exit While
         Dim q = Quoted(source, i)
         If q = Kinds.Quoted Then
-          parts.Add(q)
+        '  parts.Add(q)
           i = q.Finish
         ElseIf c.Value = Constants.Brace_L Then
 
