@@ -2,8 +2,10 @@
   Public Structure Span
     Public ReadOnly Property Start As Integer
     Public ReadOnly Property Finish As Integer
+    Public ReadOnly Property Source As SourceText 
 
-    Public Sub New(Start As Integer, Finish As Integer)
+    Public Sub New(Source As SourceText,Start As Integer, Finish As Integer)
+      _Source = Source
       _Start = Start
       _Finish = Finish
     End Sub

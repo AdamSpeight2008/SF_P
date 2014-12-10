@@ -25,6 +25,14 @@ Namespace Global.StringFormat
     Return New SourceText(s)
   End Function
 
+  Public Function GetText(s As Span) As String
+     Dim l = s.Size
+      If l = 0 Then Return String.Empty
+      If s.Start >= Length Then Return String.Empty
+      If s.Start < 0 Then Return String.Empty
+      Return _S.Substring(s.Start,l)
+  End Function
+
 End Class
 
 End Namespace

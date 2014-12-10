@@ -1,5 +1,6 @@
 ﻿Imports StringFormat.Exts
 
+
 Namespace Global.StringFormat
 
 Public Class StringFormat
@@ -48,67 +49,6 @@ Public Class StringFormat
     End Class
 
 
-    Public Class SpanKind
-
-      Public ReadOnly Property Span As Span
-      Public ReadOnly Property Kind As Kinds
-      Public ReadOnly Property MadeOf As New List(Of SpanKind)
-
-      Private Sub New(kind As Kinds, span As Span, ParamArray MadeOf() As SpanKind)
-        _Span = span
-        _Kind = kind
-        _MadeOf.AddRange(MadeOf)
-      End Sub
-
-      Shared Operator IsTrue(s As SpanKind) As Boolean
-        Return s.Kind <> Kinds.None
-      End Operator
-
-      Shared Operator IsFalse(s As SpanKind) As Boolean
-        Return s.Kind = Kinds.None
-      End Operator
-
-      Public Shared Function MakeFrom(kind As Kinds, Start As SpanKind, Finish As SpanKind, ParamArray MadeOf() As SpanKind) As SpanKind
-        Dim span = New Span(Start.Span.Start, Finish.Span.Finish)
-        Return New SpanKind(kind, span, MadeOf)
-      End Function
-
-      Public Shared Function MakeFrom(kind As Kinds, Start As Integer, Finish As Integer, ParamArray MadeOf() As SpanKind) As SpanKind
-        Dim span = New Span(Start, Finish)
-        Return New SpanKind(kind, span, MadeOf)
-      End Function
-
-      Public Shared Function MakeFrom(kind As Kinds, StartAndFinish As SpanKind) As SpanKind
-        Dim span = New Span(StartAndFinish.Span.Start, StartAndFinish.Span.Finish)
-        Return New SpanKind(kind, span)
-      End Function
-
-      Public ReadOnly Property Start() As Integer
-        Get
-          Return Span.Start
-        End Get
-      End Property
-
-      Public ReadOnly Property Finish() As Integer
-        Get
-          Return Span.Finish
-        End Get
-      End Property
-
-      Public Overrides Function ToString() As String
-        Return String.Format("{0}  {1}", Span, Kind.ToString("F"))
-      End Function
-
-      Public Shared Operator =(sk As SpanKind, k As Kinds ) As Boolean
-        If sk Is Nothing Then Return false
-        Return sk.Kind = k
-      End Operator
-      Public Shared Operator <>(sk As SpanKind, k As Kinds) As Boolean
-        If sk Is Nothing Then Return False
-        Return sk.Kind <> k
-      End Operator
-    End Class
-
 
 
     Private Shared Function Digits(source As SourceText, i As Integer) As SpanKind
@@ -127,9 +67,9 @@ Public Class StringFormat
           Exit While
         End If
       End While
-      Dim s = New Span(si, i)
-      If s.Size = 0 Then Return SpanKind.MakeFrom(Kinds.None, si, i)
-      Return SpanKind.MakeFrom(Kinds.Digits, si, i)
+      Dim s = New Span(source,si, i)
+      If s.Size = 0 Then Return SpanKind.MakeFrom(Kinds.None, source, si, i)
+      Return SpanKind.MakeFrom(Kinds.Digits,source, si, i)
     End Function
 
     Private Shared Function Spaces(source As SourceText, i As Integer) As SpanKind
@@ -141,33 +81,33 @@ Public Class StringFormat
         If c.Value <> Constants.Space Then Exit While
         i+=1
       End While
-      If (si-i)=0 Then Return SpanKind.MakeFrom(Kinds.None,si,i)
-      Return SpanKind.MakeFrom(Kinds.Spaces, si, i)
+      If (si - i) = 0 Then Return SpanKind.MakeFrom(Kinds.None, source, si, i)
+      Return SpanKind.MakeFrom(Kinds.Spaces,source, si, i)
     End Function
 
     Private Shared Function Comma(Source As SourceText, i As Integer) As SpanKind
       ' Comma ::= ','
       Dim si = i
       Dim c = Source(i)
-      If c.HasValue AndAlso c.Value = Constants.Comma Then Return SpanKind.MakeFrom(Kinds.Comma, si, i + 1)
+      If c.HasValue AndAlso c.Value = Constants.Comma Then Return SpanKind.MakeFrom(Kinds.Comma, Source, si, i + 1)
 
-      Return SpanKind.MakeFrom(Kinds.None, si, i)
+      Return SpanKind.MakeFrom(Kinds.None,source, si, i)
     End Function
 
     Private Shared Function Colon(Source As SourceText, i As Integer) As SpanKind
       ' Colon ::= ':'
       Dim si = i
       Dim c = Source(i)
-      If c.HasValue AndAlso c.Value = Constants.Colon Then Return SpanKind.MakeFrom(Kinds.Colon, si, i + 1)
-      Return SpanKind.MakeFrom(Kinds.None, si, i)
+      If c.HasValue AndAlso c.Value = Constants.Colon Then Return SpanKind.MakeFrom(Kinds.Colon,source, si, i + 1)
+      Return SpanKind.MakeFrom(Kinds.None, Source, si, i)
     End Function
 
     Private Shared Function Minus(Source As SourceText, i As Integer) As SpanKind
       ' Minus ::= '-'
       Dim si = i
       Dim c = Source(i)
-      If c.HasValue AndAlso c.Value = Constants.Minus Then Return SpanKind.MakeFrom(Kinds.Minus, si, i + 1)
-      Return SpanKind.MakeFrom(Kinds.None, si, i)
+      If c.HasValue AndAlso c.Value = Constants.Minus Then Return SpanKind.MakeFrom(Kinds.Minus, Source, si, i + 1)
+      Return SpanKind.MakeFrom(Kinds.None,source, si, i)
     End Function
 
     Private Shared Function Arg_Index(Source As SourceText, i As Integer) As SpanKind
@@ -182,13 +122,13 @@ Public Class StringFormat
           If (c.Value = Constants.Comma OrElse c.Value = Constants.Colon OrElse c.Value = Constants.Brace_R) Then
             Return SpanKind.MakeFrom(Kinds.Arg_Index, _Digits, _Spaces, parts.ToArray)
           Else
-            parts.Add(SpanKind.MakeFrom(Kinds.Err_UC, _Spaces.Finish, _Spaces.Finish + 1))
+            parts.Add(SpanKind.MakeFrom(Kinds.Err_UC,source, _Spaces.Finish, _Spaces.Finish + 1))
             Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgIndex, _Digits, _Spaces, parts.ToArray)
 
 
           End If
         Else
-          parts.Add(SpanKind.MakeFrom(Kinds.Err_EOT, _Spaces.Finish, _Spaces.Finish))
+          parts.Add(SpanKind.MakeFrom(Kinds.Err_EOT, Source, _Spaces.Finish, _Spaces.Finish))
           Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgIndex, _Digits, _Spaces, parts.ToArray)
 
         End If
@@ -231,10 +171,10 @@ Public Class StringFormat
             parts.Add(_Quoted)
             i = _Quoted.Finish
           ElseIf c.Value = Constants.Brace_R Then
-            Return SpanKind.MakeFrom(Kinds.Arg_Format, parts.First.Start, i, parts.ToArray)
+            Return SpanKind.MakeFrom(Kinds.Arg_Format,source, parts.First.Start, i, parts.ToArray)
 
           ElseIf c.Value = Constants.Brace_L Then
-            Dim _Error1_ = SpanKind.MakeFrom(Kinds.Err_UC, i, i + 1)
+            Dim _Error1_ = SpanKind.MakeFrom(Kinds.Err_UC,source, i, i + 1)
             parts.Add(_Error1_)
             i = _Error1_.Finish
           Else
@@ -242,7 +182,7 @@ Public Class StringFormat
           End If
 
         End While
-        Dim _Error0_ = SpanKind.MakeFrom(Kinds.Err_EOT, i, i)
+        Dim _Error0_ = SpanKind.MakeFrom(Kinds.Err_EOT,source, i, i)
         parts.Add(_Error0_)
         Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgFormat, parts.First, parts.Last, parts.ToArray)
     Else
@@ -279,16 +219,16 @@ Public Class StringFormat
     ' BL ::= '{'
     Dim si = i
     Dim c = Source(i)
-    If c.HasValue AndAlso c.Value = Constants.Brace_L Then Return SpanKind.MakeFrom(Kinds.BL, si, i + 1)
-    Return SpanKind.MakeFrom(Kinds.None, si, i)
+    If c.HasValue AndAlso c.Value = Constants.Brace_L Then Return SpanKind.MakeFrom(Kinds.BL,source, si, i + 1)
+    Return SpanKind.MakeFrom(Kinds.None,source, si, i)
   End Function
 
   Private Shared Function BR(Source As SourceText, i As Integer) As SpanKind
     ' BR ::= '}'
     Dim si = i
     Dim c = Source(i)
-    If c.HasValue AndAlso c.Value = Constants.Brace_R Then Return SpanKind.MakeFrom(Kinds.BR, si, i + 1)
-    Return SpanKind.MakeFrom(Kinds.None, si, i)
+    If c.HasValue AndAlso c.Value = Constants.Brace_R Then Return SpanKind.MakeFrom(Kinds.BR,source, si, i + 1)
+    Return SpanKind.MakeFrom(Kinds.None,Source, si, i)
   End Function
 
   Private Shared Function QBL(source As SourceText, i As Integer) As SpanKind
@@ -342,7 +282,7 @@ Public Class StringFormat
           i += 1
         End If
       End While
-    Return SpanKind.MakeFrom(Kinds.Text, si, i, parts.ToArray)
+    Return SpanKind.MakeFrom(Kinds.Text,source, si, i, parts.ToArray)
   End Function
 
   Private Shared Function FormatString(source As SourceText, i As Integer) As SpanKind
@@ -371,7 +311,7 @@ Public Class StringFormat
        If HasErrors Then Return SpanKind.MakeFrom(Kinds.Err_Malformed_FormatString, parts.First, parts.Last, parts.ToArray)
 Return SpanKind.MakeFrom(Kinds.FormatString, parts.First, parts.Last, parts.ToArray)
     End If
-      Return SpanKind.MakeFrom(Kinds.None, si, si)
+      Return SpanKind.MakeFrom(Kinds.None, source, si, si)
     End Function
 
   Public Shared Function Parse(s As String) As SpanKind

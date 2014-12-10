@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="SourceText.vb" />
     <Compile Include="Span.vb" />
+    <Compile Include="SpanKind.vb" />
     <Compile Include="StringFormat.vb" />
   </ItemGroup>
   <ItemGroup>
