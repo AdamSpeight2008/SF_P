@@ -9,6 +9,7 @@ Namespace Global.SFD.StringFormat
 
 
     Public Enum Kinds As Integer
+      Empty        '
       None         '
       Digits       ' ::- ( '0' - '9' )+
       BL           ' ::= '{'
@@ -152,6 +153,7 @@ Namespace Global.SFD.StringFormat
 
       If _Comma.IsNone Then Return SpanKind.MakeFrom(Kinds.None, _Comma)
       If _Minus.IsNone AndAlso _Comma.IsNotNone AndAlso _Digit.IsNotNone Then Return SpanKind.MakeFrom(Kinds.Arg_Align, _Comma, _SpaceB, parts)
+      If _Minus.IsNotNone AndAlso _Comma.IsNotNone AndAlso _Digit.IsNone Then Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgAlign, _Comma, _SpaceB, parts)
       If _Minus.IsNotNone AndAlso _Comma.IsNotNone AndAlso _Digit.IsNotNone Then Return SpanKind.MakeFrom(Kinds.Arg_Align, _Comma, _SpaceB, parts)
       Return SpanKind.MakeFrom(Kinds.Err_Malformed_ArgAlign, _Comma, _SpaceB, parts)
     End Function
@@ -277,7 +279,7 @@ Namespace Global.SFD.StringFormat
         If c.HasValue = False Then Exit While
         Dim q = Quoted(source, i)
         If q = Kinds.Quoted Then
-        '  parts.Add(q)
+          parts.Add(q)
           i = q.Finish
         ElseIf c.Value = Constants.Brace_L Then
           Dim ti = i
@@ -318,25 +320,6 @@ Namespace Global.SFD.StringFormat
           Exit While
         End If
 
-        'ElseIf _ArgHole = Kinds.Err_Malformed_ArgHole Then
-        '  If _ArgHole.Span.Size > 0 Then
-        '    parts.Add(_ArgHole)
-        '    i = _ArgHole.Finish
-        '  Else
-        '    If _Text = Kinds.Text Then
-        '      parts.Add(_Text)
-        '      i = _Text.Finish
-        '    Else
-        '      i += 1
-        '    End If
-        '  End If
-
-        'ElseIf _Text = Kinds.Text Then
-        '  parts.Add(_Text)
-        '  i = _Text.Finish
-        'Else
-        '  i += 1
-        'End If
       End While
       If parts.Count > 0 Then
         Dim HasErrors = parts.Any(Function(sk) sk.HasError)

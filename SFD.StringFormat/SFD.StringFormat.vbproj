@@ -87,6 +87,7 @@
     <Compile Include="Span.vb" />
     <Compile Include="SpanKind.vb" />
     <Compile Include="StringFormat.vb" />
+    <Compile Include="Type2_Parser.vb" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
