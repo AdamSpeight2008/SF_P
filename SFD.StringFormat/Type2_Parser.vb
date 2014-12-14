@@ -19,13 +19,13 @@
             InHole = True
             Dim arg_Hole = Parse_ArgHole(sr, i)
             spans.Add(arg_Hole)
-            If arg_Hole.HasError Then
-              InErrorState = True
-              'spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, si, i, {arg_Hole}))
-            Else
-              'spans.Add(arg_Hole)
+            'If arg_Hole.HasError Then
+            '  InErrorState = True
+            '  'spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, si, i, {arg_Hole}))
+            'Else
+            '  'spans.Add(arg_Hole)
 
-            End If
+            ' End If
 
             If Not InErrorState Then InHole = False
           Case (sr(i) = Constants.Brace_L) AndAlso InHole ' Parsing Error: Recursize hole not allowed

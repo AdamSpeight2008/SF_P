@@ -45,7 +45,8 @@ Module Module1
       "{0:}",
       "{0,1:C2",
       "{0,1:C2}",
-      "} X::= {0,9:C1}{0h}"
+      "} X::= {0,9:C1}{0h}",
+      "{} {1} {3}"
       }
     '    Dim s = " {9j}"
     'Dim r0 = ""
@@ -57,20 +58,20 @@ Module Module1
     For Each s In ss
       Dim r As SpanKind = Parse(SourceText.Create(s))
       Console.ForegroundColor = ConsoleColor.Red
-      Console.Write("{0}", s)
+      Console.Write("    {0}", s)
       Console.ForegroundColor = ConsoleColor.White
-      Console.WriteLine(" {1}", s, r)
+      Console.WriteLine("     {1}", s, r)
       For Each p In r.MadeOf
         Console.ForegroundColor = ConsoleColor.Green
-        Console.WriteLine("  {0}", p)
+        Console.WriteLine("      {0}", p)
         For Each pp In p.MadeOf
           Console.ForegroundColor = ConsoleColor.Blue
-          Console.WriteLine("    {0}", pp)
+          Console.WriteLine("        {0}", pp)
 
         Next
       Next
-      Console.WriteLine()
-      Console.ReadKey()
+      Console.WriteLine("    ")
+      'Console.ReadKey()
     Next
     'Dim r1 = StringFormat.Parse(s)
     'Dim i = 0

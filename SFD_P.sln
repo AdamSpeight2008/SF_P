@@ -7,6 +7,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SFD_P", "SFD_P.vbproj", "{9
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SFD.StringFormat", "SFD.StringFormat\SFD.StringFormat.vbproj", "{6E02193E-249B-407B-936A-B88F015FF078}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SFD_D", "..\SFD_D\SFD_D.vbproj", "{4F41688E-6AD3-4BD5-A635-4BA09D0FD10F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6E02193E-249B-407B-936A-B88F015FF078}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E02193E-249B-407B-936A-B88F015FF078}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E02193E-249B-407B-936A-B88F015FF078}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F41688E-6AD3-4BD5-A635-4BA09D0FD10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F41688E-6AD3-4BD5-A635-4BA09D0FD10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F41688E-6AD3-4BD5-A635-4BA09D0FD10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F41688E-6AD3-4BD5-A635-4BA09D0FD10F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
