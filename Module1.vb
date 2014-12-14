@@ -16,6 +16,11 @@ Module Module1
       "{",
       "{{",
       "}}",
+      "{}",
+      "{,}",
+      "{:}",
+      "{,1}",
+      "{:C2}",
       "{0}",
       "{A}",
       "{0A}",
@@ -26,7 +31,11 @@ Module Module1
       "{0,-1}",
       "{0, 1}",
       "{0, -1}",
-      "{0,A}",
+      "{0,1 }",
+      "{0,-1 }",
+      "{0, 1 }",
+      "{0, -1 }",
+      "{0, A}",
       "{0:{",
       "{0:{{",
       "{0:{{{",
@@ -46,7 +55,7 @@ Module Module1
     '  Console.WriteLine(ex)
     'End Try
     For Each s In ss
-      Dim r As SpanKind = Type2_Parser.Parse(SourceText.Create(s))
+      Dim r As SpanKind = Parse(SourceText.Create(s))
       Console.ForegroundColor = ConsoleColor.Red
       Console.Write("{0}", s)
       Console.ForegroundColor = ConsoleColor.White
