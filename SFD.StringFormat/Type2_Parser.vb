@@ -17,10 +17,16 @@
           IsQuoted = True
           spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.QBL, sr, i, i + 2))
         Case (sr(i) = "{"c) AndAlso Not InHole
+          Dim si = i
           InHole = True
           Dim arg_Hole = Parse_ArgHole(sr, i)
-          If arg_Hole.HasError Then InErrorState = True
+          If arg_Hole.HasError Then
+              InErrorState = True
+            spans.Add( SpanKind.MakeFrom( StringFormat.Kinds.Err_Malformed_ArgHole,sr,si,i  ) )
+            Else
           spans.Add(arg_Hole)
+          End If
+
           If Not InErrorState Then InHole = False
         Case (sr(i) = "{"c) AndAlso InHole ' Parsing Error: Recursize hole not allowed
           spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_UC, sr, i, i + 1))
@@ -83,7 +89,26 @@
   Private Function Parse_Arg_Format(sr As SourceText,
                               ByRef i As Integer) As SpanKind
     Dim si = i
-    While (i < sr.Length) AndAlso (sr(i) <> "}"c)
+    Dim EoAF = False 
+    While (i < sr.Length)
+      Dim c = sr(i) 
+      Dim q = Quoted(sr,i)
+      If (c = "{"c) Then
+        If q Then
+          i += 1
+        Else
+          Dim uc = SpanKind.MakeFrom(StringFormat.Kinds.BL,sr,i,i+1)
+          Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgFormat, sr, si, i, {uc})
+        End If
+      ElseIf (c="}"c) Then
+        If q Then
+          i+=1
+        Else
+          Dim uc = SpanKind.MakeFrom(StringFormat.Kinds.BR, sr, i, i + 1)
+          Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgFormat, sr, si, i, {uc})
+
+        End If
+      End If
       i += 1
     End While
     Return SpanKind.MakeFrom(StringFormat.Kinds.Arg_Format, sr, si, i)
