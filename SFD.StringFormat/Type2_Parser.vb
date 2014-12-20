@@ -19,15 +19,21 @@
             InHole = True
             Dim arg_Hole = Parse_ArgHole(sr, i)
             spans.Add(arg_Hole)
-            'If arg_Hole.HasError Then
-            '  InErrorState = True
-            '  'spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, si, i, {arg_Hole}))
-            'Else
-            '  'spans.Add(arg_Hole)
+   If arg_Hole.HasError Then
+                      i = arg_Hole.Finish - 1
+    '  '           InErrorState = True
+            '  spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, si, i, {arg_Hole}))
+            Else
+              '  spans.Add(arg_Hole)
+              i = arg_Hole.Finish' - 1
 
-            ' End If
+            End If
 
-            If Not InErrorState Then InHole = False
+
+            '       If Not InErrorState Then
+            InHole = False
+            Continue While
+          '    End If
           Case (sr(i) = Constants.Brace_L) AndAlso InHole ' Parsing Error: Recursize hole not allowed
             spans.Add(SpanKind.MakeFrom(StringFormat.Kinds.Err_UC, sr, i, i + 1))
           Case (sr(i) = Constants.Brace_R ) AndAlso (sr(i + 1) = Constants.Brace_R )
@@ -76,30 +82,31 @@
 
     Private Shared Function Parse_Arg_Alignment(sr As SourceText, ByRef i As Integer) As SpanKind
       Dim si = i
-      Dim spaces = Consume_Spaces(sr, i)
+      Dim ti = i
+      Dim spaces = Consume_Spaces(sr, ti)
       'Dim Raw = ""
       Dim parts As New List(Of SpanKind)
       Dim minus As SpanKind = Nothing
-      If sr(i) = Constants.Minus Then
-        minus = SpanKind.MakeFrom(StringFormat.Kinds.Minus, sr, i, i + 1)
+      If sr(ti) = Constants.Minus Then
+        minus = SpanKind.MakeFrom(StringFormat.Kinds.Minus, sr, ti, ti + 1)
         parts.Add(minus)
-        i += 1
+        ti += 1
       End If
-      If sr(i).IsDigit Then
-        Dim digits = sr.Parse_Digits(i)
+      If sr(ti).IsDigit Then
+        Dim digits = sr.Parse_Digits(ti)
         parts.Add(digits)
-        Dim trailingSpaces = sr.Consume_Spaces(i)
+        Dim trailingSpaces = sr.Consume_Spaces(ti)
         If trailingSpaces.Span.Size > 0 Then parts.Add(trailingSpaces)
-        Return SpanKind.MakeFrom(StringFormat.Kinds.Arg_Align, sr, si, i, parts)
+        Return SpanKind.MakeFrom(StringFormat.Kinds.Arg_Align, sr, si, ti, parts)
       Else
-        i+=1
-        Dim trailingSpaces = sr.Consume_Spaces(i)
+        ti+=1
+        Dim trailingSpaces = sr.Consume_Spaces(ti)
         If trailingSpaces.Span.Size > 0 Then parts.Add(trailingSpaces)
-        If i >= sr.Length Then Return UnepectedEOT(StringFormat.Kinds.Err_Malformed_ArgAlign, sr, si, i, parts)
+        If ti >= sr.Length Then Return UnepectedEOT(StringFormat.Kinds.Err_Malformed_ArgAlign, sr, si, ti, parts)
         'Dim uec = SpanKind.MakeFrom(StringFormat.Kinds.Err_UC, sr, i, i + 1)
         'parts(uec)
         ' Return UnepectedEOT(StringFormat.Kinds.Err_Malformed_ArgAlign,sr,si,i, parts)
-        Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgAlign, sr, si, i + 1, parts)
+        Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgAlign, sr, si, ti , parts)
       End If
     End Function
 
@@ -165,7 +172,7 @@
         If i >= sr.Length Then Return UnepectedEOT(sr, LeftEdgeOfHole, i, parts)
         Align_Value = Parse_Arg_Alignment(sr, i)
         parts.Add(Align_Value)
-        If Align_Value.HasError Then Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, LeftEdgeOfHole, i + 1, parts)
+        If Align_Value.HasError Then Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgHole, sr, LeftEdgeOfHole, Align_Value.Finish + 1, parts)
       End If
       ' Formatting
       If sr(i) = Constants.Colon  Then
@@ -238,6 +245,7 @@
     Function RemoveLast(Of T As Class)(ByRef l As List(Of T)) As T
       If l Is Nothing Then Return Nothing
       Dim lastIndex = l.Count - 1
+      'If lastIndex < 0 Then Return Nothing
       Dim lastItem = l(lastIndex)
       l.RemoveAt(lastIndex)
       Return lastItem

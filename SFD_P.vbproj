@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{98514D9A-7117-44BF-AC8E-DD9DAE704601}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>SFD_P.Module2</StartupObject>
+    <StartupObject>SFD_P.Module1</StartupObject>
     <RootNamespace>SFD_P</RootNamespace>
     <AssemblyName>SFD_P</AssemblyName>
     <FileAlignment>512</FileAlignment>
