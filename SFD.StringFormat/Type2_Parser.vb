@@ -97,6 +97,7 @@
         parts.Add(digits)
         Dim trailingSpaces = sr.Consume_Spaces(ti)
         If trailingSpaces.Span.Size > 0 Then parts.Add(trailingSpaces)
+        i=ti
         Return SpanKind.MakeFrom(StringFormat.Kinds.Arg_Align, sr, si, ti, parts)
       Else
         ti+=1
@@ -106,6 +107,7 @@
         'Dim uec = SpanKind.MakeFrom(StringFormat.Kinds.Err_UC, sr, i, i + 1)
         'parts(uec)
         ' Return UnepectedEOT(StringFormat.Kinds.Err_Malformed_ArgAlign,sr,si,i, parts)
+        i=ti
         Return SpanKind.MakeFrom(StringFormat.Kinds.Err_Malformed_ArgAlign, sr, si, ti , parts)
       End If
     End Function
