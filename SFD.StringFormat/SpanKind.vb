@@ -33,6 +33,16 @@ Namespace Global.SFD.StringFormat
       Return s.Kind = Kinds.None
     End Operator
 
+    Public Function Offset(sp As Span, k As Kinds) As SpanKind 
+      Dim s = Me.Start + sp.Start
+      Dim f = Me.Start + sp.Finish 
+      Return New SpanKind(k,New Span(Me.GetSourceText,s,f))
+    End Function
+    Public Function Offset(start As integer, finish As Integer, k As Kinds) As SpanKind
+      Dim s = Me.Start + start
+      Dim f = Me.Start + Finish
+      Return New SpanKind(k, New Span(Me.GetSourceText, s, f))
+    End Function
     Public Shared Function MakeFrom(kind As Kinds, Start As SpanKind, Finish As SpanKind,
                                     Optional MadeOf As IEnumerable(Of SpanKind)=Nothing) As SpanKind
       Dim ref = Start.Span.Source

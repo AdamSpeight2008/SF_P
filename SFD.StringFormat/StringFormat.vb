@@ -36,6 +36,10 @@ Namespace Global.SFD.StringFormat
       Err_Malformed_ArgFormat
       Err_Malformed_Text
       Err_Malformed_FormatString
+      Err_ValueExceedsLimit
+      Err_TooManySections
+      Err_IgnoredChar
+      Err_UnknownSpecifier
     End Enum
 
     Public Class Constants
